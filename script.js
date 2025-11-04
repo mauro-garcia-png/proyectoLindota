@@ -205,3 +205,81 @@ lightbox.addEventListener('click', e => {
     lightbox.classList.remove('active');
   }
 });
+
+function lanzarFuegos() {
+  const section = document.querySelector('.photo-gallery2');
+  if (!section) return;
+
+  // Crear el canvas dentro de la sección
+  const canvas = document.createElement('canvas');
+  canvas.width = section.clientWidth;
+  canvas.height = section.clientHeight;
+  canvas.style.position = 'absolute';
+  canvas.style.top = 0;
+  canvas.style.left = 0;
+  canvas.style.zIndex = 1; // debajo de fotos o texto si están en z-index más alto
+  section.style.position = 'relative';
+  section.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  const particles = [];
+
+  // Función para crear los fuegos
+  function createFirework() {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * (canvas.height / 2);
+    const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+
+    for (let i = 0; i < 50; i++) {
+      particles.push({
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 6,
+        vy: (Math.random() - 0.5) * 6,
+        alpha: 1,
+        color
+      });
+    }
+  }
+
+  // Dibujar animación
+  function draw() {
+    ctx.fillStyle = 'rgba(252, 245, 245, 0.15)'; // efecto de rastro
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.alpha -= 0.01;
+      if (p.alpha <= 0) {
+        particles.splice(i, 1);
+        continue;
+      }
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.alpha;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+
+  // Lanzar fuegos cada cierto tiempo
+  setInterval(createFirework, 700);
+  draw();
+
+  // Ajustar tamaño del canvas si cambia el tamaño de la ventana
+  window.addEventListener('resize', () => {
+    canvas.width = section.clientWidth;
+    canvas.height = section.clientHeight;
+  });
+}
+
+// Llamada al iniciar
+lanzarFuegos();
+
+
+
